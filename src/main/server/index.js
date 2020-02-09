@@ -1,8 +1,5 @@
 'use strict';
 
-const blacklist = require('blacklist');
-const WebSocketServer = require('ws').Server;
-
 const handleMessageType = {
   create: handleCreateMsg,
   update: handleUpdateMsg,
@@ -12,28 +9,27 @@ const handleMessageType = {
 };
 
 class Server {
-  constructor(opts) {
+  constructor({wss, store}) {
     this.resetHandlers();
-    this.store = opts.store;
-    const wssArg = blacklist(opts, 'store');
-    if (!wssArg.server && !wssArg.port) wssArg.port = 8080;
-    this.wss = new WebSocketServer(wssArg);
-    this.wss.on('connection', (ws) => {
-      ws.clientData = {};
-      const handleMsg = this.handleMsgFn(ws);
-      handleMsg('{"type":"connect"}');
-      ws.on('message', handleMsg);
-    });
+    this.store = store;
+    this.wss = wss;
   }
-
+  
+  acceptConnection(ws) {
+    ws.clientData = {};
+    const handleMsg = this.handleMsgFn(ws);
+    handleMsg('{"type":"connect"}');
+    ws.on('message', handleMsg);
+  }
+  
   resetHandlers() {
     this.handlers = Object.assign({}, handleMessageType);
   }
-
+  
   close() {
     this.wss.close();
   }
-
+  
   handleMsgFn(ws) {
     const s = send.bind(null, ws);
     const b = broadcast.bind(null, this.wss, ws);
@@ -107,7 +103,9 @@ function handleDeleteMsg(clientData, store, msg, respond, broadcast) {
 
 function handleResetMsg(clientData, store, msg, respond, broadcast) {
   store.resetChanges().then(() => {
-    respond({type: 'reset'});
+    respond({
+      type: 'reset'
+    });
   });
 }
 

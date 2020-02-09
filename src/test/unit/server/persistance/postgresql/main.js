@@ -1,4 +1,4 @@
-const pgPersistence = require('../index');
+const pgPersistence = require('../../../../../main/server/persistence/postgresql/index');
 const Tests = require('../../persistence-tests');
 
 const opts = {

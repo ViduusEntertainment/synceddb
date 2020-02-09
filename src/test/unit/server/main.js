@@ -1,10 +1,9 @@
 'use strict';
 
-const WebSocket = require('ws');
 const assert = require('assert');
 
 const Server = require('../server');
-const MemoryPersistence = require('../../persistence/memory');
+const MemoryPersistence = require('../persistence/memory');
 
 function socketConversation(ws, funcs) {
   const r = funcs[0]();
