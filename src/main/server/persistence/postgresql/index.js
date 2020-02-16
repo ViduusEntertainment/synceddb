@@ -1,10 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
-const knex = require('../knex');
 
 class PostgresqlDB {
-  constructor() {}
+
+  constructor(knex) {
+    this.knex = knex;
+  }
 
   get onSaveChange() {
     return {
@@ -34,7 +36,7 @@ class PostgresqlDB {
     
     const data = {};
 
-    await knex.transaction(async trx => {
+    await this.knex.transaction(async trx => {
       await this.onSaveChange[change.type](trx, change, data);
 
       change.timestamp = await trx('synceddb_changes')
@@ -55,9 +57,11 @@ class PostgresqlDB {
   async getChanges(req) {
     console.log('getChanges', req);
     
-    const since = req.since === null ? -1 : req.since[0];
+    const since = req.since === null ? -1
+      : Array.isArray(req.since) ? req.since[0]
+      : req.since;
     
-    const rows = await knex('synceddb_changes')
+    const rows = await this.knex('synceddb_changes')
       .where('storename', req.storeName)
       .andWhere('timestamp', '>', since)
       .orderBy('timestamp');
@@ -79,8 +83,8 @@ class PostgresqlDB {
   async resetChanges() {
     console.log('resetChanges');
     
-    await knex('synceddb_changes').delete();
-    await knex.raw('ALTER SEQUENCE department_user_id_seq RESTART WITH 4');
+    await this.knex('synceddb_changes').delete();
+    await this.knex.raw('ALTER SEQUENCE department_user_id_seq RESTART WITH 4');
   }
 }
 

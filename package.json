@@ -7,12 +7,13 @@
   },
   "homepage": "https://github.com/paldepind/synceddb",
   "dependencies": {
-    "knex": "^0.20.8",
-    "pg": "^4.2.0",
     "dffptch": "^1.0.4",
-    "underscore": "^1.8.3",
+    "knex": "^0.20.8",
+    "lodash": "^4.17.15",
+    "minivents": "^1.2.0",
+    "pg": "^4.2.0",
     "sync-promise": "^1.0.1",
-    "minivents": "^1.2.0"
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "eslint": "^2.8.0",
